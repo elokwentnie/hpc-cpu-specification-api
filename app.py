@@ -17,7 +17,7 @@ import pandas as pd
 import io
 from datetime import datetime
 
-from database import get_db, CPUSpec, init_db
+from database import get_db, CPUSpec, init_db, SessionLocal
 from auth import (
     verify_token,
     get_current_user,
@@ -27,6 +27,26 @@ from auth import (
 )
 
 init_db()
+
+# Auto-import CSV data on first run if database is empty
+def auto_import_if_empty():
+    """Automatically import CSV data if database is empty"""
+    db = SessionLocal()
+    try:
+        count = db.query(CPUSpec).count()
+        if count == 0:
+            csv_file_path = "cpu_specifications.csv"
+            if os.path.exists(csv_file_path):
+                try:
+                    from import_data import import_csv_to_db
+                    import_csv_to_db(csv_file_path)
+                    print(f"✅ Auto-imported data from {csv_file_path}")
+                except Exception as e:
+                    print(f"⚠️  Auto-import failed: {e}")
+    finally:
+        db.close()
+
+auto_import_if_empty()
 
 app = FastAPI(
     title="CPU Specifications API",
