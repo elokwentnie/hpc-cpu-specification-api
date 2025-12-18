@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CPU Specifications Database</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 20px;
+            color: #2c3e50;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .search-section {
+            padding: 30px;
+            background: #ffffff;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .search-container {
+            display: flex;
+            gap: 10px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        #searchInput {
+            flex: 1;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #cbd5e1;
+            border-radius: 8px;
+            transition: all 0.3s;
+            background: #ffffff;
+            color: #1e293b;
+        }
+
+        #searchInput:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        #searchButton {
+            padding: 15px 30px;
+            background: #3b82f6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        #searchButton:hover {
+            background: #2563eb;
+            transform: translateY(-1px);
+        }
+
+        .api-links {
+            padding: 20px 30px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .api-links-title {
+            font-size: 0.9em;
+            color: #64748b;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .api-links-container {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .api-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            background: #ffffff;
+            color: #1e40af;
+            text-decoration: none;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .api-link:hover {
+            background: #3b82f6;
+            color: white;
+            border-color: #3b82f6;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 25px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 15px 25px;
+            background: #ffffff;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            min-width: 120px;
+        }
+
+        .stat-value {
+            font-size: 2em;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .stat-label {
+            font-size: 0.9em;
+            color: #64748b;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        .table-section {
+            padding: 30px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
+
+        thead {
+            background: #1e40af;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #ffffff;
+            border-bottom: 2px solid #1e3a8a;
+            white-space: nowrap;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            position: relative;
+        }
+
+        th.sortable {
+            cursor: pointer;
+            user-select: none;
+            transition: background-color 0.2s;
+            padding-right: 30px;
+        }
+
+        th.sortable:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        th.sortable::after {
+            content: '⇅';
+            position: absolute;
+            right: 10px;
+            opacity: 0.5;
+            font-size: 12px;
+        }
+
+        th.sortable.sort-asc::after {
+            content: '↑';
+            opacity: 1;
+            color: #60a5fa;
+        }
+
+        th.sortable.sort-desc::after {
+            content: '↓';
+            opacity: 1;
+            color: #60a5fa;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+        }
+
+        tbody tr {
+            transition: background 0.2s;
+            background: #ffffff;
+        }
+
+        tbody tr:hover {
+            background: #f1f5f9;
+        }
+
+        tbody tr:nth-child(even) {
+            background: #f8fafc;
+        }
+
+        tbody tr:nth-child(even):hover {
+            background: #f1f5f9;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 60px;
+            color: #64748b;
+        }
+
+        .error {
+            text-align: center;
+            padding: 60px;
+            color: #dc2626;
+            background: #fef2f2;
+            margin: 20px;
+            border-radius: 8px;
+            border: 1px solid #fecaca;
+        }
+
+        .spinner {
+            border: 4px solid #e2e8f0;
+            border-top: 4px solid #3b82f6;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px;
+            color: #64748b;
+            background: #f8fafc;
+            margin: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        @media (max-width: 768px) {
+            header h1 { font-size: 1.8em; }
+            .search-container { flex-direction: column; }
+            .stats { flex-direction: column; gap: 15px; }
+            .api-links-container { flex-direction: column; gap: 10px; }
+            table { font-size: 12px; }
+            th, td { padding: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔧 CPU Specifications Database</h1>
+            <p>HPC and Datacenter CPU Specifications</p>
+        </header>
+
+        <div class="search-section">
+            <div class="search-container">
+                <input type="text" id="searchInput" placeholder="Search by model, family, or CPU model (e.g., EPYC, Xeon)...">
+                <button id="searchButton">Search</button>
+            </div>
+        </div>
+
+        <div class="api-links">
+            <div class="api-links-title">📡 Access JSON API:</div>
+            <div class="api-links-container">
+                <a href="/api/cpus" target="_blank" class="api-link">
+                    <span>📋</span>
+                    <span>All CPUs</span>
+                </a>
+                <a href="/api" target="_blank" class="api-link">
+                    <span>ℹ️</span>
+                    <span>API Info</span>
+                </a>
+                <a href="/docs" target="_blank" class="api-link">
+                    <span>📚</span>
+                    <span>API Docs</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="stats" id="stats">
+            <div class="stat-item">
+                <div class="stat-value" id="totalCpus">-</div>
+                <div class="stat-label">Total CPUs</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-value" id="uniqueFamilies">-</div>
+                <div class="stat-label">Families</div>
+            </div>
+        </div>
+
+        <div class="table-section">
+            <div id="loading" class="loading">
+                <div class="spinner"></div>
+                <p>Loading CPU data...</p>
+            </div>
+
+            <div id="error" class="error" style="display: none;">
+                <h3>⚠️ Error Loading Data</h3>
+                <p id="errorMessage"></p>
+            </div>
+
+            <div id="tableContainer" style="display: none;">
+                <table id="cpuTable">
+                    <thead>
+                        <tr>
+                            <th class="sortable" data-sort="id">ID</th>
+                            <th class="sortable" data-sort="cpu_model_name">CPU Model Name</th>
+                            <th class="sortable" data-sort="family">Family</th>
+                            <th class="sortable" data-sort="cpu_model">CPU Model</th>
+                            <th class="sortable" data-sort="cores">Cores</th>
+                            <th class="sortable" data-sort="threads">Threads</th>
+                            <th class="sortable" data-sort="max_turbo_frequency_ghz">Max Turbo (GHz)</th>
+                            <th class="sortable" data-sort="l3_cache_mb">L3 Cache (MB)</th>
+                            <th class="sortable" data-sort="tdp_watts">TDP (W)</th>
+                            <th class="sortable" data-sort="launch_year">Launch Year</th>
+                            <th class="sortable" data-sort="max_memory_tb">Max Memory (TB)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+
+            <div id="emptyState" class="empty-state" style="display: none;">
+                <p>No CPUs found matching your search.</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE = '';
+        let currentCPUs = [];
+        let currentSortColumn = null;
+        let currentSortDirection = 'asc';
+
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const tableBody = document.getElementById('tableBody');
+        const loadingDiv = document.getElementById('loading');
+        const errorDiv = document.getElementById('error');
+        const tableContainer = document.getElementById('tableContainer');
+        const emptyState = document.getElementById('emptyState');
+
+        async function fetchData(url) {
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                showError(error.message);
+                return null;
+            }
+        }
+
+        function showError(message) {
+            loadingDiv.style.display = 'none';
+            tableContainer.style.display = 'none';
+            emptyState.style.display = 'none';
+            errorDiv.style.display = 'block';
+            document.getElementById('errorMessage').textContent = message;
+        }
+
+        function displayCPUs(cpus) {
+            if (!cpus || cpus.length === 0) {
+                loadingDiv.style.display = 'none';
+                tableContainer.style.display = 'none';
+                errorDiv.style.display = 'none';
+                emptyState.style.display = 'block';
+                currentCPUs = [];
+                return;
+            }
+
+            currentCPUs = [...cpus];
+            if (currentSortColumn) {
+                sortCPUs(currentSortColumn, currentSortDirection, false);
+            } else {
+                renderTable(currentCPUs);
+            }
+        }
+
+        function renderTable(cpus) {
+            tableBody.innerHTML = '';
+            cpus.forEach(cpu => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${cpu.id}</td>
+                    <td><strong>${cpu.cpu_model_name || '-'}</strong></td>
+                    <td>${cpu.family || '-'}</td>
+                    <td>${cpu.cpu_model || '-'}</td>
+                    <td>${cpu.cores ?? '-'}</td>
+                    <td>${cpu.threads ?? '-'}</td>
+                    <td>${cpu.max_turbo_frequency_ghz ?? '-'}</td>
+                    <td>${cpu.l3_cache_mb ?? '-'}</td>
+                    <td>${cpu.tdp_watts ?? '-'}</td>
+                    <td>${cpu.launch_year ?? '-'}</td>
+                    <td>${cpu.max_memory_tb ?? '-'}</td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            loadingDiv.style.display = 'none';
+            errorDiv.style.display = 'none';
+            emptyState.style.display = 'none';
+            tableContainer.style.display = 'block';
+        }
+
+        function sortCPUs(column, direction, toggle = true) {
+            if (!currentCPUs || currentCPUs.length === 0) return;
+            if (toggle && currentSortColumn === column) {
+                direction = currentSortDirection === 'asc' ? 'desc' : 'asc';
+            }
+            currentSortColumn = column;
+            currentSortDirection = direction;
+
+            const sorted = [...currentCPUs].sort((a, b) => {
+                let aVal = a[column];
+                let bVal = b[column];
+                if (aVal === null || aVal === undefined) aVal = '';
+                if (bVal === null || bVal === undefined) bVal = '';
+                if (typeof aVal === 'number' && typeof bVal === 'number') {
+                    return direction === 'asc' ? aVal - bVal : bVal - aVal;
+                }
+                const aStr = String(aVal).toLowerCase();
+                const bStr = String(bVal).toLowerCase();
+                return direction === 'asc' ? aStr.localeCompare(bStr) : bStr.localeCompare(aStr);
+            });
+
+            updateSortIndicators(column, direction);
+            renderTable(sorted);
+        }
+
+        function updateSortIndicators(column, direction) {
+            document.querySelectorAll('th.sortable').forEach(th => {
+                th.classList.remove('sort-asc', 'sort-desc');
+            });
+            if (column && direction) {
+                const header = document.querySelector(`th[data-sort="${column}"]`);
+                if (header) header.classList.add(`sort-${direction}`);
+            }
+        }
+
+        async function loadAllCPUs() {
+            loadingDiv.style.display = 'block';
+            const cpus = await fetchData(`${API_BASE}/api/cpus?limit=1000`);
+            if (cpus) displayCPUs(cpus);
+        }
+
+        async function searchCPUs(query) {
+            if (!query || query.trim() === '') {
+                currentSortColumn = null;
+                currentSortDirection = 'asc';
+                updateSortIndicators(null, null);
+                loadAllCPUs();
+                return;
+            }
+            loadingDiv.style.display = 'block';
+            const encodedQuery = encodeURIComponent(query.trim());
+            const cpus = await fetchData(`${API_BASE}/api/cpus/search?q=${encodedQuery}`);
+            if (cpus) displayCPUs(cpus);
+        }
+
+        async function loadStats() {
+            const stats = await fetchData(`${API_BASE}/api/stats`);
+            if (stats) {
+                document.getElementById('totalCpus').textContent = stats.total_cpus || '-';
+                document.getElementById('uniqueFamilies').textContent = stats.unique_families || '-';
+            }
+        }
+
+        searchButton.addEventListener('click', () => searchCPUs(searchInput.value));
+        searchInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') searchCPUs(searchInput.value);
+        });
+
+        document.querySelectorAll('th.sortable').forEach(header => {
+            header.addEventListener('click', () => {
+                const column = header.getAttribute('data-sort');
+                if (column) sortCPUs(column, currentSortDirection);
+            });
+        });
+
+        window.addEventListener('load', () => {
+            loadAllCPUs();
+            loadStats();
+        });
+    </script>
+</body>
+</html>
+
