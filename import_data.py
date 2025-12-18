@@ -7,6 +7,7 @@ Useful for initial data import or batch updates.
 
 import csv
 from database import SessionLocal, CPUSpec, init_db
+from utils import determine_cpu_generation
 
 
 def clean_number(value, default=None):
@@ -48,16 +49,26 @@ def import_csv_to_db(csv_file_path="cpu_specifications.csv"):
                     skipped_count += 1
                     continue
 
+                family = row.get('Family', '').strip() or None
+                cpu_model = row.get('CPU Model', '').strip() or None
+                launch_year = clean_number(row.get('Launch Year'), default=None)
+                
+                # Automatically determine codename if not provided
+                codename = row.get('Codename', '').strip() or None
+                if not codename and cpu_model and launch_year:
+                    codename = determine_cpu_generation(cpu_model, launch_year, family) or None
+
                 cpu = CPUSpec(
                     cpu_model_name=cpu_model_name,
-                    family=row.get('Family', '').strip() or None,
-                    cpu_model=row.get('CPU Model', '').strip() or None,
+                    family=family,
+                    cpu_model=cpu_model,
+                    codename=codename,
                     cores=clean_number(row.get('Cores'), default=None),
                     threads=clean_number(row.get('Threads'), default=None),
                     max_turbo_frequency_ghz=clean_number(row.get('Max Turbo Frequency (GHz)'), default=None),
                     l3_cache_mb=clean_number(row.get('L3 Cache (MB)'), default=None),
                     tdp_watts=clean_number(row.get('TDP (W)'), default=None),
-                    launch_year=clean_number(row.get('Launch Year'), default=None),
+                    launch_year=launch_year,
                     max_memory_tb=clean_number(row.get('Max Memory (TB)'), default=None),
                 )
 

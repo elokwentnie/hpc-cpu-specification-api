@@ -27,6 +27,7 @@ class CPUSpec(Base):
     cpu_model_name = Column(String, index=True)
     family = Column(String)
     cpu_model = Column(String)
+    codename = Column(String, index=True)
     cores = Column(Integer)
     threads = Column(Integer)
     tdp_watts = Column(Integer)

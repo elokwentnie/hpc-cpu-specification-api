@@ -293,6 +293,10 @@
             border: 1px solid #e2e8f0;
         }
 
+        .codename-badge:hover {
+            box-shadow: 0 2px 4px rgba(67, 56, 202, 0.3);
+        }
+
         @media (max-width: 768px) {
             header h1 { font-size: 1.8em; }
             .search-container { flex-direction: column; }
@@ -312,7 +316,7 @@
 
         <div class="search-section">
             <div class="search-container">
-                <input type="text" id="searchInput" placeholder="Search by model, family, or CPU model (e.g., EPYC, Xeon)...">
+                <input type="text" id="searchInput" placeholder="Search by model, family, codename, or CPU model (e.g., Milan, EPYC, Xeon)...">
                 <button id="searchButton">Search</button>
             </div>
         </div>
@@ -323,6 +327,10 @@
                 <a href="/api/cpus" target="_blank" class="api-link">
                     <span>📋</span>
                     <span>All CPUs</span>
+                </a>
+                <a href="/visualizations" class="api-link">
+                    <span>📊</span>
+                    <span>Visualizations</span>
                 </a>
                 <a href="/api" target="_blank" class="api-link">
                     <span>ℹ️</span>
@@ -363,6 +371,7 @@
                         <tr>
                             <th class="sortable" data-sort="id">ID</th>
                             <th class="sortable" data-sort="cpu_model_name">CPU Model Name</th>
+                            <th class="sortable" data-sort="codename">Codename</th>
                             <th class="sortable" data-sort="family">Family</th>
                             <th class="sortable" data-sort="cpu_model">CPU Model</th>
                             <th class="sortable" data-sort="cores">Cores</th>
@@ -440,9 +449,14 @@
             tableBody.innerHTML = '';
             cpus.forEach(cpu => {
                 const row = document.createElement('tr');
+                const codename = cpu.codename || '-';
+                const codenameBadge = codename !== '-' 
+                    ? `<span class="codename-badge" data-codename="${codename}" style="background: #e0e7ff; color: #4338ca; padding: 4px 8px; border-radius: 4px; font-weight: 500; font-size: 0.9em; cursor: pointer; transition: all 0.2s;" title="Click to filter by ${codename}">${codename}</span>`
+                    : '<span>-</span>';
                 row.innerHTML = `
                     <td>${cpu.id}</td>
                     <td><strong>${cpu.cpu_model_name || '-'}</strong></td>
+                    <td>${codenameBadge}</td>
                     <td>${cpu.family || '-'}</td>
                     <td>${cpu.cpu_model || '-'}</td>
                     <td>${cpu.cores ?? '-'}</td>
@@ -454,6 +468,23 @@
                     <td>${cpu.max_memory_tb ?? '-'}</td>
                 `;
                 tableBody.appendChild(row);
+            });
+            
+            // Add click handlers to codename badges
+            document.querySelectorAll('.codename-badge').forEach(badge => {
+                badge.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    const codename = badge.getAttribute('data-codename');
+                    filterByCodename(codename);
+                });
+                badge.addEventListener('mouseenter', function() {
+                    this.style.background = '#c7d2fe';
+                    this.style.transform = 'scale(1.05)';
+                });
+                badge.addEventListener('mouseleave', function() {
+                    this.style.background = '#e0e7ff';
+                    this.style.transform = 'scale(1)';
+                });
             });
 
             loadingDiv.style.display = 'none';
@@ -515,6 +546,12 @@
             const encodedQuery = encodeURIComponent(query.trim());
             const cpus = await fetchData(`${API_BASE}/api/cpus/search?q=${encodedQuery}`);
             if (cpus) displayCPUs(cpus);
+        }
+
+        async function filterByCodename(codename) {
+            if (!codename || codename === '-') return;
+            searchInput.value = codename;
+            await searchCPUs(codename);
         }
 
         async function loadStats() {

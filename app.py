@@ -25,6 +25,7 @@ from auth import (
     DEFAULT_ADMIN_TOKEN,
     SECRET_KEY
 )
+from utils import determine_cpu_generation
 
 init_db()
 
@@ -63,6 +64,7 @@ class CPUSpecResponse(BaseModel):
     cpu_model_name: str
     family: Optional[str] = None
     cpu_model: Optional[str] = None
+    codename: Optional[str] = None
     cores: Optional[int] = None
     threads: Optional[int] = None
     max_turbo_frequency_ghz: Optional[float] = None
@@ -79,6 +81,12 @@ class CPUSpecResponse(BaseModel):
 async def root():
     """Serve the public web interface"""
     return FileResponse("static/index.html")
+
+
+@app.get("/visualizations", response_class=HTMLResponse)
+async def visualizations():
+    """Serve the visualizations page"""
+    return FileResponse("static/visualizations.html")
 
 
 @app.get("/admin", response_class=HTMLResponse)
@@ -129,6 +137,23 @@ async def get_all_cpus(
     return cpus
 
 
+@app.get("/api/cpus/search", response_model=List[CPUSpecResponse])
+async def search_cpus(
+    q: str = Query(..., description="Search query (searches in model name, family, CPU model, and codename)"),
+    db: Session = Depends(get_db)
+):
+    """Search CPUs by name, family, model, or codename"""
+    search_filter = or_(
+        CPUSpec.cpu_model_name.ilike(f"%{q}%"),
+        CPUSpec.family.ilike(f"%{q}%"),
+        CPUSpec.cpu_model.ilike(f"%{q}%"),
+        CPUSpec.codename.ilike(f"%{q}%")
+    )
+
+    cpus = db.query(CPUSpec).filter(search_filter).all()
+    return cpus
+
+
 @app.get("/api/cpus/{cpu_id}", response_model=CPUSpecResponse)
 async def get_cpu_by_id(cpu_id: int, db: Session = Depends(get_db)):
     """Get a specific CPU by ID"""
@@ -141,22 +166,6 @@ async def get_cpu_by_id(cpu_id: int, db: Session = Depends(get_db)):
         )
 
     return cpu
-
-
-@app.get("/api/cpus/search", response_model=List[CPUSpecResponse])
-async def search_cpus(
-    q: str = Query(..., description="Search query (searches in model name, family, and CPU model)"),
-    db: Session = Depends(get_db)
-):
-    """Search CPUs by name, family, or model"""
-    search_filter = or_(
-        CPUSpec.cpu_model_name.ilike(f"%{q}%"),
-        CPUSpec.family.ilike(f"%{q}%"),
-        CPUSpec.cpu_model.ilike(f"%{q}%")
-    )
-
-    cpus = db.query(CPUSpec).filter(search_filter).all()
-    return cpus
 
 
 @app.get("/api/stats")
@@ -248,6 +257,7 @@ class CPUSpecCreate(BaseModel):
     cpu_model_name: str
     family: Optional[str] = None
     cpu_model: Optional[str] = None
+    codename: Optional[str] = None
     cores: Optional[int] = None
     threads: Optional[int] = None
     max_turbo_frequency_ghz: Optional[float] = None
@@ -262,6 +272,7 @@ class CPUSpecUpdate(BaseModel):
     cpu_model_name: Optional[str] = None
     family: Optional[str] = None
     cpu_model: Optional[str] = None
+    codename: Optional[str] = None
     cores: Optional[int] = None
     threads: Optional[int] = None
     max_turbo_frequency_ghz: Optional[float] = None
@@ -278,10 +289,16 @@ async def create_cpu(
     current_user: dict = Depends(get_current_user)
 ):
     """Create a new CPU specification (requires authentication)"""
+    # Automatically determine codename if not provided
+    codename = cpu.codename
+    if not codename and cpu.cpu_model and cpu.launch_year:
+        codename = determine_cpu_generation(cpu.cpu_model, cpu.launch_year, cpu.family) or None
+    
     db_cpu = CPUSpec(
         cpu_model_name=cpu.cpu_model_name,
         family=cpu.family,
         cpu_model=cpu.cpu_model,
+        codename=codename,
         cores=cpu.cores,
         threads=cpu.threads,
         max_turbo_frequency_ghz=cpu.max_turbo_frequency_ghz,
@@ -349,6 +366,7 @@ async def export_csv(db: Session = Depends(get_db)):
         "CPU Model Name": cpu.cpu_model_name,
         "Family": cpu.family or "",
         "CPU Model": cpu.cpu_model or "",
+        "Codename": cpu.codename or "",
         "Cores": cpu.cores or "",
         "Threads": cpu.threads or "",
         "Max Turbo Frequency (GHz)": cpu.max_turbo_frequency_ghz or "",
@@ -381,6 +399,7 @@ async def export_excel(db: Session = Depends(get_db)):
         "CPU Model Name": cpu.cpu_model_name,
         "Family": cpu.family or "",
         "CPU Model": cpu.cpu_model or "",
+        "Codename": cpu.codename or "",
         "Cores": cpu.cores or "",
         "Threads": cpu.threads or "",
         "Max Turbo Frequency (GHz)": cpu.max_turbo_frequency_ghz or "",
@@ -462,16 +481,26 @@ async def import_csv_file(
                 errors.append(f"Row {idx + 2}: Missing CPU Model Name")
                 continue
 
+            family = str(row.get('Family', '')).strip() or None
+            cpu_model = str(row.get('CPU Model', '')).strip() or None
+            launch_year = clean_number(row.get('Launch Year'))
+            
+            # Automatically determine codename if not provided
+            codename = str(row.get('Codename', '')).strip() or None
+            if not codename and cpu_model and launch_year:
+                codename = determine_cpu_generation(cpu_model, launch_year, family) or None
+
             db_cpu = CPUSpec(
                 cpu_model_name=cpu_model_name,
-                family=str(row.get('Family', '')).strip() or None,
-                cpu_model=str(row.get('CPU Model', '')).strip() or None,
+                family=family,
+                cpu_model=cpu_model,
+                codename=codename,
                 cores=clean_number(row.get('Cores')),
                 threads=clean_number(row.get('Threads')),
                 max_turbo_frequency_ghz=clean_number(row.get('Max Turbo Frequency (GHz)')),
                 l3_cache_mb=clean_number(row.get('L3 Cache (MB)')),
                 tdp_watts=clean_number(row.get('TDP (W)')),
-                launch_year=clean_number(row.get('Launch Year')),
+                launch_year=launch_year,
                 max_memory_tb=clean_number(row.get('Max Memory (TB)'))
             )
 
@@ -536,16 +565,26 @@ async def import_csv_from_repo(
                 errors.append(f"Row {idx + 2}: Missing CPU Model Name")
                 continue
 
+            family = str(row.get('Family', '')).strip() or None
+            cpu_model = str(row.get('CPU Model', '')).strip() or None
+            launch_year = clean_number(row.get('Launch Year'))
+            
+            # Automatically determine codename if not provided
+            codename = str(row.get('Codename', '')).strip() or None
+            if not codename and cpu_model and launch_year:
+                codename = determine_cpu_generation(cpu_model, launch_year, family) or None
+
             db_cpu = CPUSpec(
                 cpu_model_name=cpu_model_name,
-                family=str(row.get('Family', '')).strip() or None,
-                cpu_model=str(row.get('CPU Model', '')).strip() or None,
+                family=family,
+                cpu_model=cpu_model,
+                codename=codename,
                 cores=clean_number(row.get('Cores')),
                 threads=clean_number(row.get('Threads')),
                 max_turbo_frequency_ghz=clean_number(row.get('Max Turbo Frequency (GHz)')),
                 l3_cache_mb=clean_number(row.get('L3 Cache (MB)')),
                 tdp_watts=clean_number(row.get('TDP (W)')),
-                launch_year=clean_number(row.get('Launch Year')),
+                launch_year=launch_year,
                 max_memory_tb=clean_number(row.get('Max Memory (TB)'))
             )
 
