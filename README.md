@@ -1,6 +1,7 @@
 # CPU Specifications Database
 
 A web application for managing and sharing HPC and datacenter CPU specifications. Provides a REST API and web interface for viewing, searching, and managing CPU data.
+The latest version available here: [https://hpc-cpu-specification-api.onrender.com/](https://hpc-cpu-specification-api.onrender.com/)
 
 ## Features
 
