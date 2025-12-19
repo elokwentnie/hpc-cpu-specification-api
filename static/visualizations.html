@@ -109,31 +109,163 @@
             box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
+        .filters-section {
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .filters-section h3 {
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1e293b;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
         .filter-group {
+            margin-bottom: 20px;
+        }
+
+        .filter-group:last-child {
+            margin-bottom: 0;
+        }
+
+        .filter-group label {
+            display: block;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .filter-select-container {
             display: flex;
             flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
+            gap: 10px;
         }
 
-        .filter-chip {
-            padding: 8px 16px;
-            background: #f1f5f9;
-            border-radius: 20px;
-            font-size: 0.9em;
+        .filter-select {
+            flex: 1;
+            min-width: 200px;
+            padding: 10px 12px;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            background: white;
             cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid transparent;
+            transition: all 0.2s;
         }
 
-        .filter-chip:hover {
+        .filter-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .filter-checkbox-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background: white;
+            border: 2px solid #cbd5e1;
+            border-radius: 6px;
+        }
+
+        .filter-checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-checkbox-item input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            accent-color: #667eea;
+        }
+
+        .filter-checkbox-item label {
+            font-weight: normal;
+            margin: 0;
+            cursor: pointer;
+            font-size: 0.9em;
+            color: #475569;
+            user-select: none;
+        }
+
+        .filter-actions {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .filter-action-btn {
+            padding: 6px 12px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .filter-action-btn:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+            color: #1e293b;
+        }
+
+        .filter-action-btn:active {
             background: #e2e8f0;
         }
 
-        .filter-chip.active {
-            background: #667eea;
+        .download-btn {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            border-color: #667eea;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .download-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+        }
+
+        .download-btn:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 768px) {
+            .filter-select {
+                min-width: 100%;
+            }
+
+            .filter-checkbox-group {
+                grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+                max-height: 150px;
+            }
+
+            .filters-section {
+                padding: 15px;
+            }
         }
 
         .chart-container {
@@ -267,25 +399,44 @@
                     </select>
                 </div>
 
-                <div class="control-group" id="barLimitGroup" style="display: none;">
-                    <label for="barLimit">Number of CPUs to Display</label>
-                    <input type="number" id="barLimit" min="5" max="100" value="25" style="width: 100px; padding: 8px; border: 1px solid #ddd; border-radius: 4px;">
+            </div>
+
+        </div>
+
+        <div class="filters-section">
+            <h3>📊 Filters</h3>
+            <div class="filter-group">
+                <label>Filter by Family:</label>
+                <div class="filter-actions">
+                    <button class="filter-action-btn" onclick="selectAllFilters('family')">Select All</button>
+                </div>
+                <div class="filter-checkbox-group" id="familyFilters">
+                    <div class="loading">Loading families...</div>
                 </div>
             </div>
-
             <div class="filter-group">
-                <label style="font-weight: 600; margin-right: 10px;">Filter by Family:</label>
-                <div id="familyFilters"></div>
-            </div>
-
-            <div class="filter-group" style="margin-top: 15px;">
-                <label style="font-weight: 600; margin-right: 10px;">Filter by Codename:</label>
-                <div id="codenameFilters"></div>
+                <label>Filter by Codename:</label>
+                <div class="filter-actions">
+                    <button class="filter-action-btn" onclick="selectAllFilters('codename')">Select All</button>
+                </div>
+                <div class="filter-checkbox-group" id="codenameFilters">
+                    <div class="loading">Loading codenames...</div>
+                </div>
             </div>
         </div>
 
         <div class="chart-container">
-            <div class="chart-title" id="chartTitle">Loading data...</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                <div class="chart-title" id="chartTitle">Loading data...</div>
+                <button id="downloadChart" class="download-btn" style="display: none; flex-shrink: 0;">
+                    <span>💾</span>
+                    <span>Download Chart</span>
+                </button>
+            </div>
+            <div id="barLimitGroup" style="display: none; margin-bottom: 15px; text-align: right;">
+                <label for="barLimit" style="display: inline-block; margin-right: 10px; font-weight: 600; color: #334155;">Number of CPUs to Display:</label>
+                <input type="number" id="barLimit" min="5" max="100" value="25" style="width: 100px; padding: 8px; border: 2px solid #cbd5e1; border-radius: 6px; font-size: 14px;">
+            </div>
             <div id="chart">
                 <div class="loading">Loading chart data...</div>
             </div>
@@ -315,8 +466,14 @@
                 </div>
             </div>
             <div id="comparisonResult" style="display: none;">
+                <div style="text-align: right; margin-bottom: 15px;">
+                    <button id="downloadComparison" class="download-btn" style="display: inline-flex;">
+                        <span>💾</span>
+                        <span>Download Comparison</span>
+                    </button>
+                </div>
                 <div class="comparison-table-container" style="max-width: 1200px; margin: 0 auto;">
-                    <table class="comparison-table" style="width: 100%; border-collapse: separate; border-spacing: 0; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
+                    <table class="comparison-table" id="comparisonTable" style="width: 100%; border-collapse: separate; border-spacing: 0; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
                         <thead>
                             <tr style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
                                 <th style="padding: 20px; text-align: left; font-weight: 600; color: #1e293b; font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; width: 25%;">Specification</th>
@@ -378,80 +535,117 @@
             document.getElementById('avgFreq').textContent = avgFreq;
         }
 
-        // Setup filter chips
+        // Setup filter checkboxes
         function setupFilters() {
             const families = [...new Set(allCpus.map(cpu => cpu.family).filter(f => f))].sort();
             const codenames = [...new Set(allCpus.map(cpu => cpu.codename).filter(c => c))].sort();
 
             const familyContainer = document.getElementById('familyFilters');
-            familyContainer.innerHTML = '<span class="filter-chip active" data-type="family" data-value="all">All</span>';
+            familyContainer.innerHTML = '';
             families.forEach(family => {
-                const chip = document.createElement('span');
-                chip.className = 'filter-chip active';
-                chip.textContent = family;
-                chip.dataset.type = 'family';
-                chip.dataset.value = family;
-                chip.onclick = () => toggleFilter('family', family);
-                familyContainer.appendChild(chip);
+                const item = document.createElement('div');
+                item.className = 'filter-checkbox-item';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `family-${family.replace(/\s+/g, '-')}`;
+                checkbox.checked = true;
+                checkbox.dataset.type = 'family';
+                checkbox.dataset.value = family;
+                checkbox.addEventListener('change', (e) => {
+                    toggleFilter('family', family, e.target.checked);
+                });
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.textContent = family;
+                item.appendChild(checkbox);
+                item.appendChild(label);
+                familyContainer.appendChild(item);
                 activeFamilies.add(family);
             });
 
             const codenameContainer = document.getElementById('codenameFilters');
-            codenameContainer.innerHTML = '<span class="filter-chip active" data-type="codename" data-value="all">All</span>';
+            codenameContainer.innerHTML = '';
             codenames.forEach(codename => {
-                const chip = document.createElement('span');
-                chip.className = 'filter-chip active';
-                chip.textContent = codename;
-                chip.dataset.type = 'codename';
-                chip.dataset.value = codename;
-                chip.onclick = () => toggleFilter('codename', codename);
-                codenameContainer.appendChild(chip);
+                const item = document.createElement('div');
+                item.className = 'filter-checkbox-item';
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = `codename-${codename.replace(/\s+/g, '-')}`;
+                checkbox.checked = true;
+                checkbox.dataset.type = 'codename';
+                checkbox.dataset.value = codename;
+                checkbox.addEventListener('change', (e) => {
+                    toggleFilter('codename', codename, e.target.checked);
+                });
+                const label = document.createElement('label');
+                label.htmlFor = checkbox.id;
+                label.textContent = codename;
+                item.appendChild(checkbox);
+                item.appendChild(label);
+                codenameContainer.appendChild(item);
                 activeCodenames.add(codename);
             });
         }
 
         // Toggle filter
-        function toggleFilter(type, value) {
-            if (value === 'all') {
-                if (type === 'family') {
-                    activeFamilies.clear();
-                    document.querySelectorAll('[data-type="family"]').forEach(chip => {
-                        chip.classList.add('active');
-                        if (chip.dataset.value !== 'all') {
-                            activeFamilies.add(chip.dataset.value);
-                        }
-                    });
+        function toggleFilter(type, value, checked) {
+            if (type === 'family') {
+                if (checked) {
+                    activeFamilies.add(value);
                 } else {
-                    activeCodenames.clear();
-                    document.querySelectorAll('[data-type="codename"]').forEach(chip => {
-                        chip.classList.add('active');
-                        if (chip.dataset.value !== 'all') {
-                            activeCodenames.add(chip.dataset.value);
-                        }
-                    });
+                    activeFamilies.delete(value);
                 }
             } else {
-                const chip = document.querySelector(`[data-type="${type}"][data-value="${value}"]`);
-                if (type === 'family') {
-                    if (activeFamilies.has(value)) {
-                        activeFamilies.delete(value);
-                        chip.classList.remove('active');
-                    } else {
-                        activeFamilies.add(value);
-                        chip.classList.add('active');
-                    }
+                if (checked) {
+                    activeCodenames.add(value);
                 } else {
-                    if (activeCodenames.has(value)) {
-                        activeCodenames.delete(value);
-                        chip.classList.remove('active');
-                    } else {
-                        activeCodenames.add(value);
-                        chip.classList.add('active');
-                    }
+                    activeCodenames.delete(value);
                 }
             }
             applyFilters();
         }
+
+        // Select all filters of a type
+        window.selectAllFilters = function(type) {
+            const container = type === 'family' 
+                ? document.getElementById('familyFilters')
+                : document.getElementById('codenameFilters');
+            
+            if (!container) return;
+            
+            const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = true;
+                const value = checkbox.dataset.value;
+                if (type === 'family') {
+                    activeFamilies.add(value);
+                } else {
+                    activeCodenames.add(value);
+                }
+            });
+            applyFilters();
+        };
+
+        // Select none filters of a type
+        window.selectNoneFilters = function(type) {
+            const container = type === 'family' 
+                ? document.getElementById('familyFilters')
+                : document.getElementById('codenameFilters');
+            
+            if (!container) return;
+            
+            const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.checked = false;
+                const value = checkbox.dataset.value;
+                if (type === 'family') {
+                    activeFamilies.delete(value);
+                } else {
+                    activeCodenames.delete(value);
+                }
+            });
+            applyFilters();
+        };
 
         // Apply filters
         function applyFilters() {
@@ -483,7 +677,14 @@
             if (validCpus.length === 0) {
                 document.getElementById('chart').innerHTML = 
                     '<div class="error">No data available for selected parameters</div>';
+                document.getElementById('downloadChart').style.display = 'none';
                 return;
+            }
+            
+            // Show download button when we have valid data
+            const downloadBtn = document.getElementById('downloadChart');
+            if (downloadBtn) {
+                downloadBtn.style.display = 'inline-flex';
             }
 
             let traces = [];
@@ -669,6 +870,11 @@
                         boxpoints: 'all',
                         jitter: 0.3,
                         pointpos: -1.8,
+                        text: familyCpus.map(cpu => cpu.cpu_model_name || 'Unknown CPU'),
+                        hovertemplate: '<b>%{text}</b><br>' +
+                                      'Family: ' + family + '<br>' +
+                                      yLabel + ': %{y}<br>' +
+                                      '<extra></extra>',
                         marker: {
                             size: 8,
                             opacity: 0.8,
@@ -703,6 +909,32 @@
 
             Plotly.newPlot('chart', traces, layout, { responsive: true });
         }
+
+        // Download chart function
+        function downloadChart() {
+            const xAxis = document.getElementById('xAxis').value;
+            const yAxis = document.getElementById('yAxis').value;
+            const chartType = document.getElementById('chartType').value;
+            
+            const xLabel = document.getElementById('xAxis').options[document.getElementById('xAxis').selectedIndex].text;
+            const yLabel = document.getElementById('yAxis').options[document.getElementById('yAxis').selectedIndex].text;
+            
+            // Create descriptive filename
+            const chartTypeName = chartType === 'bar' ? 'Bar' : chartType === 'scatter' ? 'Scatter' : 'Box';
+            const filename = `CPU_${chartTypeName}_${yLabel.replace(/[^a-zA-Z0-9]/g, '_')}_vs_${xLabel.replace(/[^a-zA-Z0-9]/g, '_')}_${new Date().toISOString().split('T')[0]}.png`;
+            
+            // Download the chart
+            Plotly.downloadImage('chart', {
+                format: 'png',
+                width: 1200,
+                height: 800,
+                filename: filename
+            });
+        }
+
+        // Download button event listeners
+        document.getElementById('downloadChart').addEventListener('click', downloadChart);
+        document.getElementById('downloadComparison').addEventListener('click', downloadComparisonTable);
 
         // CPU Comparison Functions
         function populateComparisonDropdowns() {
@@ -793,19 +1025,23 @@
                 if (param.type === 'number' && val1 != null && val2 != null && param.higher) {
                     const diff = val2 - val1;
                     const percentDiff = val1 !== 0 ? ((diff / val1) * 100).toFixed(1) : 0;
+                    // Round diff to 2 decimal places to avoid floating point precision issues
+                    const diffRounded = Math.abs(diff).toFixed(2);
+                    // Remove trailing zeros for cleaner display
+                    const diffFormatted = parseFloat(diffRounded).toString();
                     
                     if (diff > 0) {
                         const badgeClass = param.higher === 'better' ? 'better' : 'worse';
                         const bgColor = param.higher === 'better' ? '#d1fae5' : '#fee2e2';
                         const textColor = param.higher === 'better' ? '#065f46' : '#991b1b';
                         cell2Style += ` background: ${bgColor};`;
-                        diffHtml = `<span style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; font-weight: 600; background: ${bgColor}; color: ${textColor};">+${Math.abs(diff)}${param.unit ? ' ' + param.unit : ''} (+${Math.abs(percentDiff)}%)</span>`;
+                        diffHtml = `<span style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; font-weight: 600; background: ${bgColor}; color: ${textColor};">+${diffFormatted}${param.unit ? ' ' + param.unit : ''} (+${Math.abs(percentDiff)}%)</span>`;
                     } else if (diff < 0) {
                         const badgeClass = param.higher === 'better' ? 'worse' : 'better';
                         const bgColor = param.higher === 'better' ? '#fee2e2' : '#d1fae5';
                         const textColor = param.higher === 'better' ? '#991b1b' : '#065f46';
                         cell1Style += ` background: ${bgColor};`;
-                        diffHtml = `<span style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; font-weight: 600; background: ${bgColor}; color: ${textColor};">${diff}${param.unit ? ' ' + param.unit : ''} (${percentDiff}%)</span>`;
+                        diffHtml = `<span style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; font-weight: 600; background: ${bgColor}; color: ${textColor};">-${diffFormatted}${param.unit ? ' ' + param.unit : ''} (${percentDiff}%)</span>`;
                     } else {
                         diffHtml = '<span style="display: inline-block; padding: 4px 10px; border-radius: 4px; font-size: 0.85em; font-weight: 600; background: #f1f5f9; color: #475569;">Same</span>';
                     }
@@ -836,7 +1072,85 @@
                 comparisonBody.appendChild(row);
             });
             
+            // Store CPU data for download
+            window.currentComparison = { cpu1, cpu2, parameters };
+            
             document.getElementById('comparisonResult').style.display = 'block';
+        }
+
+        // Download comparison table as CSV
+        function downloadComparisonTable() {
+            if (!window.currentComparison) return;
+            
+            const { cpu1, cpu2, parameters } = window.currentComparison;
+            const cpu1Name = cpu1.cpu_model_name || 'CPU 1';
+            const cpu2Name = cpu2.cpu_model_name || 'CPU 2';
+            
+            // Escape function for CSV values
+            const escapeCSV = (str) => {
+                if (str === null || str === undefined) return '';
+                const s = String(str);
+                // Always wrap in quotes and escape internal quotes for proper CSV format
+                return '"' + s.replace(/"/g, '""') + '"';
+            };
+            
+            // Create CSV content with properly escaped header
+            let csv = escapeCSV('Specification') + ',' + 
+                      escapeCSV(cpu1Name) + ',' + 
+                      escapeCSV(cpu2Name) + ',' + 
+                      escapeCSV('Difference') + '\n';
+            
+            parameters.forEach(param => {
+                const val1 = cpu1[param.key];
+                const val2 = cpu2[param.key];
+                
+                const formatValue = param.format || ((v) => v != null ? v : '-');
+                const display1 = formatValue(val1);
+                const display2 = formatValue(val2);
+                const unit1 = (param.unit && display1 !== '-') ? ` ${param.unit}` : '';
+                const unit2 = (param.unit && display2 !== '-') ? ` ${param.unit}` : '';
+                
+                let diff = '';
+                if (param.type === 'number' && val1 != null && val2 != null && param.higher) {
+                    const diffValue = val2 - val1;
+                    const percentDiff = val1 !== 0 ? ((diffValue / val1) * 100).toFixed(1) : 0;
+                    const diffRounded = Math.abs(diffValue).toFixed(2);
+                    const diffFormatted = parseFloat(diffRounded).toString();
+                    
+                    if (diffValue > 0) {
+                        diff = `+${diffFormatted}${param.unit ? ' ' + param.unit : ''} (+${Math.abs(percentDiff)}%)`;
+                    } else if (diffValue < 0) {
+                        diff = `-${diffFormatted}${param.unit ? ' ' + param.unit : ''} (${percentDiff}%)`;
+                    } else {
+                        diff = 'Same';
+                    }
+                } else if (param.type === 'text') {
+                    diff = val1 === val2 ? 'Same' : 'Different';
+                } else {
+                    diff = val1 === val2 ? 'Same' : 'Different';
+                }
+                
+                csv += escapeCSV(param.label) + ',' + 
+                       escapeCSV(display1 + unit1) + ',' + 
+                       escapeCSV(display2 + unit2) + ',' + 
+                       escapeCSV(diff) + '\n';
+            });
+            
+            // Create download link
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            
+            // Create filename with CPU names and date
+            const dateStr = new Date().toISOString().split('T')[0];
+            const filename = `CPU_Comparison_${cpu1Name.replace(/[^a-zA-Z0-9]/g, '_')}_vs_${cpu2Name.replace(/[^a-zA-Z0-9]/g, '_')}_${dateStr}.csv`;
+            link.setAttribute('download', filename);
+            
+            link.style.visibility = 'hidden';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         // Event listeners

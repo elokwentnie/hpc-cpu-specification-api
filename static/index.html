@@ -297,6 +297,66 @@
             box-shadow: 0 2px 4px rgba(67, 56, 202, 0.3);
         }
 
+        .pagination-container {
+            padding: 20px 30px;
+            background: #ffffff;
+            border-top: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .pagination-info {
+            display: flex;
+            align-items: center;
+            font-size: 14px;
+            color: #64748b;
+        }
+
+        .pagination-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .pagination-btn {
+            padding: 8px 16px;
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .pagination-btn:hover:not(:disabled) {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+            color: #1e293b;
+        }
+
+        .pagination-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            padding: 0 12px;
+            font-size: 14px;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        #pageSizeSelect:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
         @media (max-width: 768px) {
             header h1 { font-size: 1.8em; }
             .search-container { flex-direction: column; }
@@ -390,6 +450,28 @@
             <div id="emptyState" class="empty-state" style="display: none;">
                 <p>No CPUs found matching your search.</p>
             </div>
+
+            <div id="pagination" class="pagination-container" style="display: none;">
+                <div class="pagination-info">
+                    <span>Show</span>
+                    <select id="pageSizeSelect" style="margin: 0 8px; padding: 6px 10px; border: 1px solid #cbd5e1; border-radius: 4px; font-size: 14px;">
+                        <option value="25" selected>25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                        <option value="200">200</option>
+                        <option value="500">500</option>
+                    </select>
+                    <span>entries</span>
+                    <span id="paginationInfo" style="margin-left: 20px; color: #64748b;"></span>
+                </div>
+                <div class="pagination-controls">
+                    <button id="firstPage" class="pagination-btn" disabled>First</button>
+                    <button id="prevPage" class="pagination-btn" disabled>Previous</button>
+                    <span id="pageInfo" class="page-info">Page 1 of 1</span>
+                    <button id="nextPage" class="pagination-btn">Next</button>
+                    <button id="lastPage" class="pagination-btn">Last</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -398,6 +480,10 @@
         let currentCPUs = [];
         let currentSortColumn = null;
         let currentSortDirection = 'asc';
+        let currentPage = 1;
+        let pageSize = 25;
+        let totalPages = 1;
+        let searchTimeout = null;
 
         const searchInput = document.getElementById('searchInput');
         const searchButton = document.getElementById('searchButton');
@@ -434,10 +520,13 @@
                 errorDiv.style.display = 'none';
                 emptyState.style.display = 'block';
                 currentCPUs = [];
+                currentPage = 1;
+                updatePagination(0);
                 return;
             }
 
             currentCPUs = [...cpus];
+            currentPage = 1; // Reset to first page when new data is loaded
             if (currentSortColumn) {
                 sortCPUs(currentSortColumn, currentSortDirection, false);
             } else {
@@ -446,8 +535,30 @@
         }
 
         function renderTable(cpus) {
+            if (!cpus || cpus.length === 0) {
+                tableBody.innerHTML = '';
+                updatePagination(0);
+                loadingDiv.style.display = 'none';
+                errorDiv.style.display = 'none';
+                emptyState.style.display = 'block';
+                tableContainer.style.display = 'none';
+                return;
+            }
+
+            // Calculate pagination
+            totalPages = Math.ceil(cpus.length / pageSize);
+            if (currentPage > totalPages && totalPages > 0) {
+                currentPage = totalPages;
+            }
+            if (currentPage < 1) currentPage = 1;
+
+            // Get current page data
+            const startIndex = (currentPage - 1) * pageSize;
+            const endIndex = startIndex + pageSize;
+            const pageData = cpus.slice(startIndex, endIndex);
+
             tableBody.innerHTML = '';
-            cpus.forEach(cpu => {
+            pageData.forEach(cpu => {
                 const row = document.createElement('tr');
                 const codename = cpu.codename || '-';
                 const codenameBadge = codename !== '-' 
@@ -487,10 +598,57 @@
                 });
             });
 
+            updatePagination(cpus.length);
             loadingDiv.style.display = 'none';
             errorDiv.style.display = 'none';
             emptyState.style.display = 'none';
             tableContainer.style.display = 'block';
+        }
+
+        function updatePagination(totalItems) {
+            const paginationDiv = document.getElementById('pagination');
+            if (totalItems === 0) {
+                paginationDiv.style.display = 'none';
+                return;
+            }
+
+            paginationDiv.style.display = 'flex';
+            
+            // Update pagination info
+            const startItem = totalItems === 0 ? 0 : (currentPage - 1) * pageSize + 1;
+            const endItem = Math.min(currentPage * pageSize, totalItems);
+            document.getElementById('paginationInfo').textContent = 
+                `Showing ${startItem} to ${endItem} of ${totalItems} entries`;
+
+            // Update page info
+            document.getElementById('pageInfo').textContent = 
+                `Page ${currentPage} of ${totalPages}`;
+
+            // Update button states
+            document.getElementById('firstPage').disabled = currentPage === 1;
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage === totalPages;
+            document.getElementById('lastPage').disabled = currentPage === totalPages;
+        }
+
+        function goToPage(page) {
+            if (page < 1 || page > totalPages) return;
+            currentPage = page;
+            if (currentSortColumn) {
+                sortCPUs(currentSortColumn, currentSortDirection, false);
+            } else {
+                renderTable(currentCPUs);
+            }
+        }
+
+        function changePageSize(newSize) {
+            pageSize = parseInt(newSize);
+            currentPage = 1; // Reset to first page
+            if (currentSortColumn) {
+                sortCPUs(currentSortColumn, currentSortDirection, false);
+            } else {
+                renderTable(currentCPUs);
+            }
         }
 
         function sortCPUs(column, direction, toggle = true) {
@@ -535,6 +693,12 @@
         }
 
         async function searchCPUs(query) {
+            // Clear any pending search timeout
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+                searchTimeout = null;
+            }
+
             if (!query || query.trim() === '') {
                 currentSortColumn = null;
                 currentSortDirection = 'asc';
@@ -542,16 +706,37 @@
                 loadAllCPUs();
                 return;
             }
+            
             loadingDiv.style.display = 'block';
             const encodedQuery = encodeURIComponent(query.trim());
             const cpus = await fetchData(`${API_BASE}/api/cpus/search?q=${encodedQuery}`);
             if (cpus) displayCPUs(cpus);
         }
 
+        // Debounced search for real-time filtering
+        function debouncedSearch(query) {
+            // Clear existing timeout
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+            }
+            
+            // Set new timeout to search after user stops typing
+            searchTimeout = setTimeout(() => {
+                searchCPUs(query);
+            }, 300); // Wait 300ms after user stops typing
+        }
+
         async function filterByCodename(codename) {
             if (!codename || codename === '-') return;
-            searchInput.value = codename;
-            await searchCPUs(codename);
+            
+            // Toggle behavior: if already filtering by this codename, reset to show all
+            if (searchInput.value === codename) {
+                searchInput.value = '';
+                await searchCPUs('');
+            } else {
+                searchInput.value = codename;
+                await searchCPUs(codename);
+            }
         }
 
         async function loadStats() {
@@ -562,9 +747,29 @@
             }
         }
 
-        searchButton.addEventListener('click', () => searchCPUs(searchInput.value));
+        // Real-time search as user types
+        searchInput.addEventListener('input', (e) => {
+            debouncedSearch(e.target.value);
+        });
+
+        // Search button click (immediate search)
+        searchButton.addEventListener('click', () => {
+            if (searchTimeout) {
+                clearTimeout(searchTimeout);
+                searchTimeout = null;
+            }
+            searchCPUs(searchInput.value);
+        });
+
+        // Enter key (immediate search)
         searchInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') searchCPUs(searchInput.value);
+            if (e.key === 'Enter') {
+                if (searchTimeout) {
+                    clearTimeout(searchTimeout);
+                    searchTimeout = null;
+                }
+                searchCPUs(searchInput.value);
+            }
         });
 
         document.querySelectorAll('th.sortable').forEach(header => {
@@ -573,6 +778,13 @@
                 if (column) sortCPUs(column, currentSortDirection);
             });
         });
+
+        // Pagination event listeners
+        document.getElementById('firstPage').addEventListener('click', () => goToPage(1));
+        document.getElementById('prevPage').addEventListener('click', () => goToPage(currentPage - 1));
+        document.getElementById('nextPage').addEventListener('click', () => goToPage(currentPage + 1));
+        document.getElementById('lastPage').addEventListener('click', () => goToPage(totalPages));
+        document.getElementById('pageSizeSelect').addEventListener('change', (e) => changePageSize(e.target.value));
 
         window.addEventListener('load', () => {
             loadAllCPUs();

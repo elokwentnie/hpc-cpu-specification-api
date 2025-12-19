@@ -6,7 +6,7 @@ Provides REST API endpoints and web interfaces for viewing and managing CPU data
 """
 
 from fastapi import FastAPI, Depends, Query, HTTPException, UploadFile, File
-from fastapi.responses import JSONResponse, HTMLResponse, FileResponse, StreamingResponse
+from fastapi.responses import JSONResponse, HTMLResponse, FileResponse, StreamingResponse, Response
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import or_
@@ -56,6 +56,12 @@ app = FastAPI(
 )
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
+
+
+@app.get("/favicon.ico")
+async def favicon():
+    """Handle favicon requests to prevent 404 errors"""
+    return Response(status_code=204)
 
 
 class CPUSpecResponse(BaseModel):
