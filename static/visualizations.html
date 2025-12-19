@@ -254,6 +254,31 @@
         }
 
         @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8em;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .controls {
+                padding: 15px;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
             .filter-select {
                 min-width: 100%;
             }
@@ -265,6 +290,137 @@
 
             .filters-section {
                 padding: 15px;
+            }
+
+            .chart-container {
+                padding: 15px;
+            }
+
+            .chart-title {
+                font-size: 1.1em;
+            }
+
+            #chart {
+                min-height: 400px;
+                margin-bottom: 20px;
+            }
+
+            /* Fix chart legend and layout for mobile */
+            .js-plotly-plot {
+                overflow-x: auto;
+            }
+
+            /* Ensure comparison section is accessible */
+            .chart-container:last-child {
+                margin-bottom: 40px;
+                padding-bottom: 30px;
+            }
+
+            /* Smooth scrolling */
+            html {
+                scroll-behavior: smooth;
+            }
+
+            /* Ensure body can scroll */
+            body {
+                overflow-x: hidden;
+                overflow-y: auto;
+            }
+
+            /* Comparison table mobile fixes */
+            .chart-container:last-child {
+                padding: 15px 10px !important;
+            }
+
+            .comparison-table-container {
+                overflow-x: auto !important;
+                -webkit-overflow-scrolling: touch;
+                margin: 0 -10px;
+                padding: 0 10px;
+                width: calc(100% + 20px);
+            }
+
+            .comparison-table {
+                min-width: 650px !important;
+                font-size: 11px;
+                width: 100%;
+            }
+
+            .comparison-table th,
+            .comparison-table td {
+                padding: 8px 5px;
+                font-size: 10px;
+                white-space: nowrap;
+            }
+
+            .comparison-table th:first-child,
+            .comparison-table td:first-child {
+                position: sticky;
+                left: 0;
+                background: white;
+                z-index: 10;
+                min-width: 110px;
+                max-width: 110px;
+            }
+
+            .comparison-table th:not(:first-child),
+            .comparison-table td:not(:first-child) {
+                min-width: 120px;
+            }
+
+            .comparison-controls {
+                padding: 0 10px;
+            }
+
+            .comparison-selectors {
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+            }
+
+            .download-btn {
+                padding: 8px 16px;
+                font-size: 13px;
+                margin-top: 10px;
+            }
+
+            /* Stats cards mobile */
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 10px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-value {
+                font-size: 1.5em;
+            }
+
+            /* Chart title and download button row */
+            .chart-container > div:first-child {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+
+            #downloadChart {
+                width: 100%;
+                justify-content: center;
+            }
+
+            #barLimitGroup {
+                width: 100%;
+                text-align: left !important;
+            }
+
+            #barLimitGroup label {
+                display: block;
+                margin-bottom: 5px;
+            }
+
+            #barLimit {
+                width: 100%;
             }
         }
 
@@ -476,10 +632,10 @@
                     <table class="comparison-table" id="comparisonTable" style="width: 100%; border-collapse: separate; border-spacing: 0; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);">
                         <thead>
                             <tr style="background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);">
-                                <th style="padding: 20px; text-align: left; font-weight: 600; color: #1e293b; font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; width: 25%;">Specification</th>
-                                <th id="cpu1NameHeader" style="padding: 20px; text-align: center; font-weight: 600; color: #1e293b; font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; width: 25%;">CPU 1</th>
-                                <th id="cpu2NameHeader" style="padding: 20px; text-align: center; font-weight: 600; color: #1e293b; font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; width: 25%;">CPU 2</th>
-                                <th style="padding: 20px; text-align: center; font-weight: 600; color: #1e293b; font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.5px; border-bottom: 2px solid #e2e8f0; width: 25%;">Difference</th>
+                                <th style="padding: 12px 8px; text-align: left; font-weight: 600; color: #1e293b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 2px solid #e2e8f0;">Specification</th>
+                                <th id="cpu1NameHeader" style="padding: 12px 8px; text-align: center; font-weight: 600; color: #1e293b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 2px solid #e2e8f0;">CPU 1</th>
+                                <th id="cpu2NameHeader" style="padding: 12px 8px; text-align: center; font-weight: 600; color: #1e293b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 2px solid #e2e8f0;">CPU 2</th>
+                                <th style="padding: 12px 8px; text-align: center; font-weight: 600; color: #1e293b; font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.3px; border-bottom: 2px solid #e2e8f0;">Difference</th>
                             </tr>
                         </thead>
                         <tbody id="comparisonBody">
@@ -729,15 +885,47 @@
                     });
                 });
 
+                // Detect mobile screen size
+                const isMobile = window.innerWidth <= 768;
+                
                 layout = {
                     title: {
                         text: `${yLabel} vs ${xLabel}`,
-                        font: { size: 18 }
+                        font: { size: isMobile ? 14 : 18 }
                     },
-                    xaxis: { title: xLabel },
-                    yaxis: { title: yLabel },
+                    xaxis: { 
+                        title: xLabel,
+                        titlefont: { size: isMobile ? 12 : 14 }
+                    },
+                    yaxis: { 
+                        title: yLabel,
+                        titlefont: { size: isMobile ? 12 : 14 }
+                    },
                     hovermode: 'closest',
-                    margin: { l: 60, r: 20, t: 60, b: 60 }
+                    margin: isMobile 
+                        ? { l: 50, r: 10, t: 50, b: 100 }
+                        : { l: 60, r: 20, t: 60, b: 60 },
+                    showlegend: true,
+                    legend: isMobile ? {
+                        x: 0.5,
+                        y: -0.25,
+                        xanchor: 'center',
+                        yanchor: 'top',
+                        orientation: 'h',
+                        bgcolor: 'rgba(255, 255, 255, 0.9)',
+                        bordercolor: '#e2e8f0',
+                        borderwidth: 1,
+                        font: { size: 10 },
+                        itemwidth: 20
+                    } : {
+                        x: 1.02,
+                        y: 1,
+                        xanchor: 'left',
+                        yanchor: 'top',
+                        bgcolor: 'rgba(255, 255, 255, 0.8)',
+                        bordercolor: '#e2e8f0',
+                        borderwidth: 1
+                    }
                 };
             } else if (chartType === 'bar') {
                 // Get limit from input (default 25)
@@ -818,23 +1006,41 @@
                     }
                 });
 
+                // Detect mobile screen size
+                const isMobile = window.innerWidth <= 768;
+                
                 layout = {
                     title: {
                         text: `Top ${sorted.length} CPUs by ${yLabel}`,
-                        font: { size: 18 }
+                        font: { size: isMobile ? 14 : 18 }
                     },
                     xaxis: { 
-                        title: yLabel
+                        title: yLabel,
+                        titlefont: { size: isMobile ? 12 : 14 }
                     },
                     yaxis: { 
                         title: 'CPU Model',
                         automargin: true,
                         tickmode: 'linear',
-                        tickangle: 0
+                        tickangle: 0,
+                        titlefont: { size: isMobile ? 12 : 14 }
                     },
-                    margin: { l: 250, r: 150, t: 60, b: 60 },
+                    margin: isMobile 
+                        ? { l: 180, r: 20, t: 50, b: 100 }
+                        : { l: 250, r: 150, t: 60, b: 60 },
                     showlegend: true,
-                    legend: {
+                    legend: isMobile ? {
+                        x: 0.5,
+                        y: -0.25,
+                        xanchor: 'center',
+                        yanchor: 'top',
+                        orientation: 'h',
+                        bgcolor: 'rgba(255, 255, 255, 0.9)',
+                        bordercolor: '#e2e8f0',
+                        borderwidth: 1,
+                        font: { size: 10 },
+                        itemwidth: 20
+                    } : {
                         x: 1.02,
                         y: 1,
                         xanchor: 'left',
@@ -893,21 +1099,78 @@
                     });
                 });
 
+                // Detect mobile screen size
+                const isMobile = window.innerWidth <= 768;
+                
                 layout = {
                     title: {
                         text: `Distribution of ${yLabel} by Family`,
-                        font: { size: 18 }
+                        font: { size: isMobile ? 14 : 18 }
                     },
-                    yaxis: { title: yLabel },
+                    yaxis: { 
+                        title: yLabel,
+                        titlefont: { size: isMobile ? 12 : 14 }
+                    },
                     xaxis: { 
                         title: 'Family',
-                        tickangle: 0
+                        tickangle: 0,
+                        titlefont: { size: isMobile ? 12 : 14 }
                     },
-                    margin: { l: 60, r: 20, t: 60, b: 100 }
+                    margin: isMobile 
+                        ? { l: 50, r: 10, t: 50, b: 150 }
+                        : { l: 60, r: 20, t: 60, b: 100 },
+                    showlegend: true,
+                    legend: isMobile ? {
+                        x: 0.5,
+                        y: -0.25,
+                        xanchor: 'center',
+                        yanchor: 'top',
+                        orientation: 'h',
+                        bgcolor: 'rgba(255, 255, 255, 0.9)',
+                        bordercolor: '#e2e8f0',
+                        borderwidth: 1,
+                        font: { size: 10 },
+                        itemwidth: 20
+                    } : {
+                        x: 1.02,
+                        y: 1,
+                        xanchor: 'left',
+                        yanchor: 'top',
+                        bgcolor: 'rgba(255, 255, 255, 0.8)',
+                        bordercolor: '#e2e8f0',
+                        borderwidth: 1
+                    }
                 };
             }
 
-            Plotly.newPlot('chart', traces, layout, { responsive: true });
+            // No need for updateLayoutForMobile - layout is already set correctly above
+            // Detect mobile for modebar
+            const isMobile = window.innerWidth <= 768;
+            
+            Plotly.newPlot('chart', traces, layout, { 
+                responsive: true,
+                displayModeBar: !isMobile, // Hide modebar on mobile
+                modeBarButtonsToRemove: ['lasso2d', 'select2d'],
+                displaylogo: false
+            });
+            
+            // Update chart on window resize for mobile
+            let resizeTimeout;
+            let resizeHandler = () => {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    const chartElement = document.getElementById('chart');
+                    if (chartElement && chartElement.children.length > 0) {
+                        Plotly.Plots.resize('chart');
+                    }
+                }, 250);
+            };
+            
+            // Only add resize listener once
+            if (!window.chartResizeHandlerAdded) {
+                window.addEventListener('resize', resizeHandler);
+                window.chartResizeHandlerAdded = true;
+            }
         }
 
         // Download chart function
@@ -1017,10 +1280,15 @@
                 const val1 = cpu1[param.key];
                 const val2 = cpu2[param.key];
                 
+                // Detect mobile for responsive padding
+                const isMobile = window.innerWidth <= 768;
+                const cellPadding = isMobile ? 'padding: 10px 6px;' : 'padding: 16px 20px;';
+                const labelPadding = isMobile ? 'padding: 10px 6px;' : 'padding: 16px 20px;';
+                
                 let diffHtml = '';
                 let diffClass = '';
-                let cell1Style = 'padding: 16px 20px; text-align: center; border-bottom: 1px solid #f1f5f9;';
-                let cell2Style = 'padding: 16px 20px; text-align: center; border-bottom: 1px solid #f1f5f9;';
+                let cell1Style = cellPadding + ' text-align: center; border-bottom: 1px solid #f1f5f9;';
+                let cell2Style = cellPadding + ' text-align: center; border-bottom: 1px solid #f1f5f9;';
                 
                 if (param.type === 'number' && val1 != null && val2 != null && param.higher) {
                     const diff = val2 - val1;
@@ -1063,11 +1331,12 @@
                 
                 const rowBg = index % 2 === 0 ? 'background: #ffffff;' : 'background: #f8fafc;';
                 
+                const fontSize = isMobile ? 'font-size: 0.9em;' : 'font-size: 1em;';
                 row.innerHTML = `
-                    <td style="padding: 16px 20px; font-weight: 600; color: #334155; border-bottom: 1px solid #f1f5f9; ${rowBg}">${param.label}</td>
-                    <td style="${cell1Style} ${rowBg}"><span style="color: #1e293b; font-size: 1em; font-weight: 500;">${display1}${unit1}</span></td>
-                    <td style="${cell2Style} ${rowBg}"><span style="color: #1e293b; font-size: 1em; font-weight: 500;">${display2}${unit2}</span></td>
-                    <td style="padding: 16px 20px; text-align: center; border-bottom: 1px solid #f1f5f9; ${rowBg}">${diffHtml}</td>
+                    <td style="${labelPadding} font-weight: 600; color: #334155; border-bottom: 1px solid #f1f5f9; ${rowBg}">${param.label}</td>
+                    <td style="${cell1Style} ${rowBg}"><span style="color: #1e293b; ${fontSize} font-weight: 500;">${display1}${unit1}</span></td>
+                    <td style="${cell2Style} ${rowBg}"><span style="color: #1e293b; ${fontSize} font-weight: 500;">${display2}${unit2}</span></td>
+                    <td style="${cellPadding} text-align: center; border-bottom: 1px solid #f1f5f9; ${rowBg}">${diffHtml}</td>
                 `;
                 comparisonBody.appendChild(row);
             });

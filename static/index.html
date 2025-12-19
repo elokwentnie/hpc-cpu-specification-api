@@ -358,12 +358,95 @@
         }
 
         @media (max-width: 768px) {
-            header h1 { font-size: 1.8em; }
-            .search-container { flex-direction: column; }
-            .stats { flex-direction: column; gap: 15px; }
-            .api-links-container { flex-direction: column; gap: 10px; }
-            table { font-size: 12px; }
-            th, td { padding: 8px; }
+            body {
+                padding: 10px;
+            }
+
+            header {
+                padding: 20px;
+            }
+
+            header h1 { 
+                font-size: 1.8em; 
+            }
+
+            .search-container { 
+                flex-direction: column; 
+            }
+
+            .stats { 
+                flex-direction: column; 
+                gap: 15px; 
+            }
+
+            .api-links-container { 
+                flex-direction: column; 
+                gap: 10px; 
+            }
+
+            .table-section {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            table { 
+                font-size: 11px;
+                min-width: 800px;
+            }
+
+            th, td { 
+                padding: 6px 8px; 
+            }
+
+            .pagination-container {
+                flex-direction: column;
+                gap: 15px;
+                padding: 15px 20px;
+            }
+
+            .pagination-info {
+                flex-wrap: wrap;
+                justify-content: center;
+                text-align: center;
+                font-size: 12px;
+                width: 100%;
+            }
+
+            .pagination-info span {
+                display: inline-block;
+                margin: 2px 4px;
+            }
+
+            #paginationInfo {
+                display: block;
+                width: 100%;
+                margin-top: 8px;
+                margin-left: 0 !important;
+            }
+
+            .pagination-controls {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 8px;
+            }
+
+            .pagination-btn {
+                padding: 8px 12px;
+                font-size: 13px;
+                min-width: 70px;
+            }
+
+            .page-info {
+                width: 100%;
+                text-align: center;
+                padding: 8px 0;
+                font-size: 13px;
+            }
+
+            #pageSizeSelect {
+                font-size: 13px;
+                padding: 6px 8px;
+            }
         }
     </style>
 </head>
